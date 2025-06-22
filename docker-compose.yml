@@ -10,6 +10,9 @@ services:
       POSTGRES_DB: flinkjam
     volumes:
       - "./docker-data/postgis:/var/lib/postgresql/data"
-      - "./sql/01-enable-hstore.sql:/docker-entrypoint-initdb.d/01-enable-hstore.sql"
+      - "./sql/01-enable-hstore.sql:/docker-entrypoint-initdb.d/20-enable-hstore.sql"
+      - "./sql/02-create_tables.sql:/docker-entrypoint-initdb.d/30-create_tables.sql"
     ports:
       - "5432:5432"
+    healthcheck:
+      test: "PGPASSWORD=${POSTGRES_PASSWORD} pg_isready -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
