@@ -18,7 +18,8 @@ public class FullyEnrichedTrafficEvent {
     public String roadType;
     public List<TrafficLightInfo> nearbyTrafficLights; // List of nearby traffic lights
 
-    public FullyEnrichedTrafficEvent() {}
+    public FullyEnrichedTrafficEvent() {
+    }
 
     public FullyEnrichedTrafficEvent(RoadEnrichedTrafficEvent roadEvent, List<TrafficLightInfo> nearbyTrafficLights) {
         this.timestamp = roadEvent.timestamp;
@@ -33,15 +34,41 @@ public class FullyEnrichedTrafficEvent {
     }
 
     // Getters
-    public long getTimestamp() { return timestamp; }
-    public String getVehicleId() { return vehicleId; }
-    public String getRoadSegmentId() { return roadSegmentId; }
-    public double getSpeed() { return speed; }
-    public double getLatitude() { return latitude; }
-    public double getLongitude() { return longitude; }
-    public int getSpeedLimitKmh() { return speedLimitKmh; }
-    public String getRoadType() { return roadType; }
-    public List<TrafficLightInfo> getNearbyTrafficLights() { return nearbyTrafficLights; }
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getVehicleId() {
+        return vehicleId;
+    }
+
+    public String getRoadSegmentId() {
+        return roadSegmentId;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public int getSpeedLimitKmh() {
+        return speedLimitKmh;
+    }
+
+    public String getRoadType() {
+        return roadType;
+    }
+
+    public List<TrafficLightInfo> getNearbyTrafficLights() {
+        return nearbyTrafficLights;
+    }
 
 
     @Override

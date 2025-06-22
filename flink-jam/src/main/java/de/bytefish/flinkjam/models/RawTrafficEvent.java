@@ -10,7 +10,8 @@ public class RawTrafficEvent {
     public double longitude;
     public double speed;
 
-    public RawTrafficEvent() {}
+    public RawTrafficEvent() {
+    }
 
     public RawTrafficEvent(long timestamp, String vehicleId, double latitude, double longitude, double speed) {
         this.timestamp = timestamp;
@@ -21,11 +22,25 @@ public class RawTrafficEvent {
     }
 
     // Getters
-    public long getTimestamp() { return timestamp; }
-    public String getVehicleId() { return vehicleId; }
-    public double getLatitude() { return latitude; }
-    public double getLongitude() { return longitude; }
-    public double getSpeed() { return speed; }
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getVehicleId() {
+        return vehicleId;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
 
     @Override
     public String toString() {

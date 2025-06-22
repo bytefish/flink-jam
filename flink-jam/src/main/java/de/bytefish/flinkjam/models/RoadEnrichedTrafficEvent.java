@@ -14,7 +14,8 @@ public class RoadEnrichedTrafficEvent {
     public int speedLimitKmh;
     public String roadType;
 
-    public RoadEnrichedTrafficEvent() {}
+    public RoadEnrichedTrafficEvent() {
+    }
 
     public RoadEnrichedTrafficEvent(RawTrafficEvent rawEvent, String roadSegmentId, int speedLimitKmh, String roadType) {
         this.timestamp = rawEvent.timestamp;
@@ -28,14 +29,37 @@ public class RoadEnrichedTrafficEvent {
     }
 
     // Getters (needed for Flink's POJO detection and keying)
-    public long getTimestamp() { return timestamp; }
-    public String getVehicleId() { return vehicleId; }
-    public String getRoadSegmentId() { return roadSegmentId; }
-    public double getSpeed() { return speed; }
-    public double getLatitude() { return latitude; }
-    public double getLongitude() { return longitude; }
-    public int getSpeedLimitKmh() { return speedLimitKmh; }
-    public String getRoadType() { return roadType; }
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getVehicleId() {
+        return vehicleId;
+    }
+
+    public String getRoadSegmentId() {
+        return roadSegmentId;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public int getSpeedLimitKmh() {
+        return speedLimitKmh;
+    }
+
+    public String getRoadType() {
+        return roadType;
+    }
 
     @Override
     public String toString() {

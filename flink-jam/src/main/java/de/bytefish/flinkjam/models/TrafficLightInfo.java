@@ -13,7 +13,8 @@ public class TrafficLightInfo {
     public boolean isPedestrianCrossingLight;
     public double distanceMeters; // Distance from the vehicle to this traffic light
 
-    public TrafficLightInfo() {}
+    public TrafficLightInfo() {
+    }
 
     public TrafficLightInfo(long osmId, String name, double latitude, double longitude, boolean isPedestrianCrossingLight, double distanceMeters) {
         this.osmId = osmId;
