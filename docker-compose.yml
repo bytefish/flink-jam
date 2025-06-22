@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: postgis_db
+    environment:
+      POSTGRES_USER: postgis
+      POSTGRES_PASSWORD: postgis
+      POSTGRES_DB: flinkjam
+    volumes:
+      - "./docker-data/postgis:/var/lib/postgresql/data"
+      - "./sql/01-enable-hstore.sql:/docker-entrypoint-initdb.d/01-enable-hstore.sql"
+    ports:
+      - "5432:5432"
