@@ -25,6 +25,7 @@ public class WarningDebouncerFunction extends KeyedProcessFunction<String, Conge
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
+
         lastWarningMetadataState = getRuntimeContext().getState(
                 new ValueStateDescriptor<>("lastWarningMetadata", TypeInformation.of(LastWarningMetadata.class))
         );
@@ -49,7 +50,7 @@ public class WarningDebouncerFunction extends KeyedProcessFunction<String, Conge
             Collector<CongestionWarning> out) throws Exception {
 
         LastWarningMetadata lastMetadata = lastWarningMetadataState.value();
-        long currentTime = ctx.timerService().currentProcessingTime();
+        long currentTime = warning.timestamp;
         int incomingSeverity = getSeverity(warning.warningType);
 
         if (lastMetadata == null) {
