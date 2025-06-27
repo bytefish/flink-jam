@@ -1,6 +1,8 @@
 package de.bytefish.flinkjam;
 
 import de.bytefish.flinkjam.lookup.AsyncRoadSegmentLookupFunction;
+import de.bytefish.flinkjam.lookup.AsyncTrafficLightLookupFunction;
+import de.bytefish.flinkjam.models.FullyEnrichedTrafficEvent;
 import de.bytefish.flinkjam.models.RawTrafficEvent;
 import de.bytefish.flinkjam.models.RoadEnrichedTrafficEvent;
 import de.bytefish.flinkjam.sources.RawTrafficEventSource;
@@ -50,6 +52,13 @@ public class TrafficCongestionWarningSystem {
         // Next is enriching the events with the TrafficLightInformation. This needs to be done, because we don't
         // want to generate dozens of false positives, if cars are in a red light phase. If we don't take traffic
         // lights into consideration, each red light phase would generate an event.
+        DataStream<FullyEnrichedTrafficEvent> fullyEnrichedEvents = AsyncDataStream.unorderedWait(
+                roadEnrichedEvents,
+                new AsyncTrafficLightLookupFunction(DB_URL, DB_USER, DB_PASSWORD, 20),
+                500, TimeUnit.MILLISECONDS, 100 // Increased timeout to 15 seconds
+        );
+
+        fullyEnrichedEvents.print("Fully Enriched Event");
 
         env.execute("flink-jam: Traffic Congestion Warning System");
     }

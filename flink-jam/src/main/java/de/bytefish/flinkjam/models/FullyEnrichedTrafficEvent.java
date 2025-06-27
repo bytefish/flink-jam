@@ -8,6 +8,7 @@ import java.util.Objects;
  * This is the event used for CEP.
  */
 public class FullyEnrichedTrafficEvent implements java.io.Serializable {
+
     public long timestamp;
     public String vehicleId;
     public double latitude;
