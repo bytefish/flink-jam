@@ -1,6 +1,7 @@
 package de.bytefish.flinkjam;
 
 import de.bytefish.flinkjam.cep.CongestionPatternProcessFunction;
+import de.bytefish.flinkjam.cep.WarningDebouncerFunction;
 import de.bytefish.flinkjam.lookup.AsyncRoadSegmentLookupFunction;
 import de.bytefish.flinkjam.lookup.AsyncTrafficLightLookupFunction;
 import de.bytefish.flinkjam.models.CongestionWarning;
@@ -141,8 +142,6 @@ public class TrafficCongestionWarningSystem {
 
         DataStream<CongestionWarning> lightSlowdownWarnings = CEP.pattern(keyedTrafficEvents, lightSlowdownPattern).process(
                 new CongestionPatternProcessFunction("Light Slowdown", lightSlowdownConfig.speedThresholdFactor, 0.0, lightSlowdownConfig.minUniqueVehicles, lightSlowdownConfig.getTrafficLightNearbyRadiusInMeters()));
-        lightSlowdownWarnings.print("Light Slowdown Warning");
-
 
         // Pattern 2: Sustained Slowdown (more severe than Light Slowdown)
         TrafficCongestionConfig sustainedSlowdownConfig = new TrafficCongestionConfig(5, 0.5, 0, Duration.ofSeconds(60), 3, 30);
@@ -162,8 +161,6 @@ public class TrafficCongestionWarningSystem {
                 .pattern(keyedTrafficEvents, sustainedSlowdownPattern)
                 .process(new CongestionPatternProcessFunction("Sustained Slowdown", sustainedSlowdownConfig.speedThresholdFactor, 0.0, sustainedSlowdownConfig.minUniqueVehicles, sustainedSlowdownConfig.getTrafficLightNearbyRadiusInMeters()));
 
-        sustainedSlowdownWarnings.print("Sustained Slowdown Warning");
-
         // Pattern 3: Traffic Jam (most severe, near-stop)
         TrafficCongestionConfig trafficJamConfig = new TrafficCongestionConfig(7, 0, 10, Duration.ofSeconds(60), 5, 30);
 
@@ -181,7 +178,18 @@ public class TrafficCongestionWarningSystem {
         DataStream<CongestionWarning> trafficJamWarnings = CEP.pattern(keyedTrafficEvents, trafficJamPattern).process(
                 new CongestionPatternProcessFunction("Traffic Jam", 0.0, trafficJamConfig.absoluteSpeedThresholdKmh, trafficJamConfig.minUniqueVehicles, trafficJamConfig.trafficLightNearbyRadiusInMeters));
 
-        trafficJamWarnings.print("Traffic Jam Warning");
+        DataStream<CongestionWarning> allWarnings = lightSlowdownWarnings
+                .union(sustainedSlowdownWarnings)
+                .union(trafficJamWarnings);
+
+        // Apply debouncing to the combined warnings stream with severity awareness
+        long debouncePeriodMs = Duration.ofSeconds(60).toMillis();
+
+        DataStream<CongestionWarning> debouncedWarnings = allWarnings
+                .keyBy(CongestionWarning::getRoadSegmentId)
+                .process(new WarningDebouncerFunction(debouncePeriodMs));
+
+        debouncedWarnings.print("DEBOUNCED CONGESTION WARNING");
 
         env.execute("flink-jam: Traffic Congestion Warning System");
     }

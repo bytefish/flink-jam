@@ -66,6 +66,26 @@ public class CongestionPatternProcessFunction extends org.apache.flink.cep.funct
 
         double averageSpeed = totalSpeed / allMatchedEvents.size();
 
+        // Check speed of the last event to prevent stale warnings
+        FullyEnrichedTrafficEvent lastEvent = allMatchedEvents.get(allMatchedEvents.size() - 1);
+        boolean lastEventStillSlowEnough = false;
+
+        if (warningBaseType.equals("Traffic Jam")) {
+            if (lastEvent.getSpeed() < absoluteSpeedThresholdKmh * 1.5) { // Allow some slight increase but still very slow
+                lastEventStillSlowEnough = true;
+            }
+        } else {
+            if (lastEvent.getSpeed() < (lastEvent.getSpeedLimitKmh() * (speedThresholdFactor + 0.15))) { // Allow slightly higher speed than threshold
+                lastEventStillSlowEnough = true;
+            }
+        }
+
+        if (!lastEventStillSlowEnough) {
+            System.out.println(String.format("Skipping %s warning: Last event speed (%.2f km/h) indicates clearing traffic or transient slowdown on road segment %s.",
+                    warningBaseType, lastEvent.getSpeed(), firstEvent.roadSegmentId));
+            return;
+        }
+
         String actualWarningType = warningBaseType;
         String details;
 
@@ -103,7 +123,6 @@ public class CongestionPatternProcessFunction extends org.apache.flink.cep.funct
             } else {
                 // If it's a Traffic Jam AND NOT near a light, it's a more serious general jam
                 if (warningBaseType.equals("Traffic Jam")) {
-                    actualWarningType = "Traffic Jam (General)";
                     details = String.format("Severe congestion (Avg Speed: %.2f km/h) detected on road segment %s. No immediate traffic light nearby. Potential incident/bottleneck. Involved vehicles: %d.",
                             averageSpeed, firstEvent.roadSegmentId, uniqueVehicles.size());
                 }

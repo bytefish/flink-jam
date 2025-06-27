@@ -29,6 +29,38 @@ public class CongestionWarning implements java.io.Serializable  {
         this.affectedUniqueVehiclesCount = affectedUniqueVehiclesCount;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getWarningType() {
+        return warningType;
+    }
+
+    public String getRoadSegmentId() {
+        return roadSegmentId;
+    }
+
+    public double getCurrentAverageSpeed() {
+        return currentAverageSpeed;
+    }
+
+    public int getSpeedLimit() {
+        return speedLimit;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public List<TrafficLightInfo> getRelatedTrafficLights() {
+        return relatedTrafficLights;
+    }
+
+    public int getAffectedUniqueVehiclesCount() {
+        return affectedUniqueVehiclesCount;
+    }
+
     @Override
     public String toString() {
         return "!!! CONGESTION ALERT !!! " +
