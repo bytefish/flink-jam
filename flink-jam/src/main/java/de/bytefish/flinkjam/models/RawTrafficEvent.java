@@ -3,7 +3,8 @@ package de.bytefish.flinkjam.models;
 /**
  * Represents a raw real-time traffic event from a vehicle, before any enrichment.
  */
-public class RawTrafficEvent {
+public class RawTrafficEvent implements java.io.Serializable {
+
     public long timestamp;
     public String vehicleId;
     public double latitude;
@@ -40,6 +41,26 @@ public class RawTrafficEvent {
 
     public double getSpeed() {
         return speed;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setVehicleId(String vehicleId) {
+        this.vehicleId = vehicleId;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     @Override

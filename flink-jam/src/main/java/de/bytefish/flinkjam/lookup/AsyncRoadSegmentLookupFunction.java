@@ -20,10 +20,11 @@ import java.util.concurrent.Executors;
 public class AsyncRoadSegmentLookupFunction extends RichAsyncFunction<RawTrafficEvent, RoadEnrichedTrafficEvent> {
 
     private transient ExecutorService executorService;
-    private final String dbUrl;
-    private final String dbUser;
-    private final String dbPassword;
-    private final double lookupRadiusMeters;
+
+    private String dbUrl;
+    private String dbUser;
+    private String dbPassword;
+    private double lookupRadiusMeters;
 
     public AsyncRoadSegmentLookupFunction(String dbUrl, String dbUser, String dbPassword, double lookupRadiusMeters) {
         this.dbUrl = dbUrl;

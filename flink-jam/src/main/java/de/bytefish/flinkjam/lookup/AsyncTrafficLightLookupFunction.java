@@ -21,10 +21,10 @@ public class AsyncTrafficLightLookupFunction extends RichAsyncFunction<RoadEnric
 
     private transient ExecutorService executorService;
 
-    private final String dbUrl;
-    private final String dbUser;
-    private final String dbPassword;
-    private final double lookupRadiusMeters;
+    private String dbUrl;
+    private String dbUser;
+    private String dbPassword;
+    private double lookupRadiusMeters;
 
     private static final String LOOKUP_SQL =
             "SELECT osm_id, name, ST_Y(geom) AS latitude, ST_X(geom) AS longitude, is_pedestrian_crossing_light, " +

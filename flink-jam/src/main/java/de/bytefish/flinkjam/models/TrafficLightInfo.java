@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Represents information about a single nearby traffic light.
  */
-public class TrafficLightInfo {
+public class TrafficLightInfo implements java.io.Serializable {
     public long osmId;
     public String name;
     public double latitude;

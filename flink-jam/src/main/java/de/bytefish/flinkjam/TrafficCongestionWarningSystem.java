@@ -28,7 +28,7 @@ public class TrafficCongestionWarningSystem {
         // out-of-orderness.
         WatermarkStrategy<RawTrafficEvent> rawEventWmStrategy = WatermarkStrategy
                 .<RawTrafficEvent>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                .withTimestampAssigner((event, recordTimestamp) -> event.getTimestamp());
+                .withTimestampAssigner((event, recordTimestamp) -> event.timestamp);
 
         // The simulation should include the following types: Normal Traffic, Light Slowdown, Sustained Slowdown,
         // Traffic Jam, Red Light Phase.  We don't have access to a real data source, so we generate our own

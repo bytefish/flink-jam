@@ -1,4 +1,4 @@
-INSERT INTO road_segments (odm_id, osm_type, name, ref, road_type, speed_limit_kmh, tags, geom)
+INSERT INTO road_segments (osm_id, osm_type, name, ref, road_type, speed_limit_kmh, tags, geom)
 SELECT
     osm_id AS osm_id,
     highway AS osm_type,
@@ -35,9 +35,9 @@ WHERE
 -- Update all road segments best guessing the speed limit, based on German road types.
 UPDATE road_segments
 SET speed_limit_kmh = CASE
-    WHEN type = 'Autobahn' AND speed_limit_kmh IS NULL THEN 130 -- German Autobahn advisory speed (no general limit)
-    WHEN type IN ('Bundesstrasse', 'Landesstrasse', 'Unclassified') AND speed_limit_kmh IS NULL THEN 100 -- Rural roads
-    WHEN type IN ('Stadtstrasse', 'Residential', 'Service Road') AND speed_limit_kmh IS NULL THEN 50 -- Urban areas
+    WHEN road_type = 'Autobahn' AND speed_limit_kmh IS NULL THEN 130 -- German Autobahn advisory speed (no general limit)
+    WHEN road_type IN ('Bundesstrasse', 'Landesstrasse', 'Unclassified') AND speed_limit_kmh IS NULL THEN 100 -- Rural roads
+    WHEN road_type IN ('Stadtstrasse', 'Residential', 'Service Road') AND speed_limit_kmh IS NULL THEN 50 -- Urban areas
     ELSE speed_limit_kmh -- Keep existing specific speed limits
 END
 WHERE speed_limit_kmh IS NULL; -- Only update rows where speed_limit_kmh is currently NULL
@@ -70,7 +70,7 @@ WHERE ctid IN (
     SELECT ctid FROM (
         SELECT
             ctid,
-            ROW_NUMBER() OVER (PARTITION BY id ORDER BY id) as rn
+            ROW_NUMBER() OVER (PARTITION BY osm_id ORDER BY osm_id) as rn
         FROM traffic_lights
     ) t WHERE t.rn > 1
 );

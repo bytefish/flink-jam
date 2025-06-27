@@ -4,7 +4,7 @@ package de.bytefish.flinkjam.models;
 /**
  * Represents a traffic event enriched with road segment data.
  */
-public class RoadEnrichedTrafficEvent {
+public class RoadEnrichedTrafficEvent implements java.io.Serializable  {
     public long timestamp;
     public String vehicleId;
     public double latitude;

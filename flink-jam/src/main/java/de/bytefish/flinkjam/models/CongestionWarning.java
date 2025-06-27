@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Represents a detected congestion warning.
  */
-public class CongestionWarning {
+public class CongestionWarning implements java.io.Serializable  {
     public long timestamp;
     public String warningType;
     public String roadSegmentId;

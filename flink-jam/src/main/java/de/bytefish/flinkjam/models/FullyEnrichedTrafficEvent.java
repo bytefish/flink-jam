@@ -7,7 +7,7 @@ import java.util.Objects;
  * Represents a fully enriched traffic event, including road segment and nearby traffic light data.
  * This is the event used for CEP.
  */
-public class FullyEnrichedTrafficEvent {
+public class FullyEnrichedTrafficEvent implements java.io.Serializable {
     public long timestamp;
     public String vehicleId;
     public double latitude;
