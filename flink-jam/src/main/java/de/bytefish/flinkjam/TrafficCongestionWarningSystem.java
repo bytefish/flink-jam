@@ -91,6 +91,8 @@ public class TrafficCongestionWarningSystem {
         DataStream<RawTrafficEvent> rawTrafficEvents = env.addSource(new RawTrafficEventSource())
                 .assignTimestampsAndWatermarks(rawEventWmStrategy); // Apply watermark strategy
 
+        rawTrafficEvents.print("Raw Traffic Event");
+
         // Now we need to enrich the raw events with the road segment data, so we get the speed limit and road_segment,
         // the possible congestion is on. This is done using the RichAsyncFunction, with 10m as the Lookup Function
         // for Road Segments.
