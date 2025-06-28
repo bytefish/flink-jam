@@ -30,6 +30,22 @@ public class AsyncRoadSegmentLookupFunction extends RichAsyncFunction<RawTraffic
     private String dbPassword;
     private double lookupRadiusMeters;
 
+    private static final String LOOKUP_SQL =
+            "SELECT\n" +
+                    "    osm_id, \n" +
+                    "    osm_type,\n" +
+                    "    road_type,\n" +
+                    "    speed_limit_kmh,\n" +
+                    "    name,\n" +
+                    "    geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography as distance\n" +
+                    "FROM\n" +
+                    "    road_segments\n" +
+                    "WHERE \n" +
+                    "    ST_DWithin(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography, ?)\n" +
+                    "ORDER BY \n" +
+                    "    distance asc";
+
+
     public AsyncRoadSegmentLookupFunction(String dbUrl, String dbUser, String dbPassword, double lookupRadiusMeters) {
         this.dbUrl = dbUrl;
         this.dbUser = dbUser;
@@ -82,20 +98,7 @@ public class AsyncRoadSegmentLookupFunction extends RichAsyncFunction<RawTraffic
         executorService.submit(() -> {
             RoadEnrichedTrafficEvent outputEvent = null;
             try (Connection connection = dataSource.getConnection()) {
-                try (PreparedStatement statement = connection.prepareStatement(
-                        "SELECT\n" +
-                                "    osm_id, \n" +
-                                "    osm_type,\n" +
-                                "    road_type,\n" +
-                                "    speed_limit_kmh,\n" +
-                                "    name,\n" +
-                                "    geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography as distance\n" +
-                                "FROM\n" +
-                                "    road_segments\n" +
-                                "WHERE \n" +
-                                "    ST_DWithin(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography, ?)\n" +
-                                "ORDER BY \n" +
-                                "    distance asc")) {
+                try (PreparedStatement statement = connection.prepareStatement(LOOKUP_SQL)) {
 
                     statement.setDouble(1, input.longitude);
                     statement.setDouble(2, input.latitude);
