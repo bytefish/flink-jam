@@ -18,4 +18,13 @@ public class LastWarningMetadata implements Serializable {
         this.warningType = warningType;
         this.severity = severity;
     }
+
+    @Override
+    public String toString() {
+        return "LastWarningMetadata{" +
+                "timestamp=" + timestamp +
+                ", warningType='" + warningType + '\'' +
+                ", severity=" + severity +
+                '}';
+    }
 }

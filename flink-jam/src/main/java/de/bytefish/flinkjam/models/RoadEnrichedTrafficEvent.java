@@ -66,9 +66,11 @@ public class RoadEnrichedTrafficEvent implements java.io.Serializable  {
         return "RoadEnrichedTrafficEvent{" +
                 "timestamp=" + timestamp +
                 ", vehicleId='" + vehicleId + '\'' +
-                ", roadSegmentId='" + roadSegmentId + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", speed=" + speed +
-                ", speedLimit=" + speedLimitKmh +
+                ", roadSegmentId='" + roadSegmentId + '\'' +
+                ", speedLimitKmh=" + speedLimitKmh +
                 ", roadType='" + roadType + '\'' +
                 '}';
     }

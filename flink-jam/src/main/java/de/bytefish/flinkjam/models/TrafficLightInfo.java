@@ -42,12 +42,12 @@ public class TrafficLightInfo implements java.io.Serializable {
     @Override
     public String toString() {
         return "TrafficLightInfo{" +
-                "id=" + osmId +
+                "osm_id=" + osmId +
                 ", name='" + (name != null ? name : "N/A") + '\'' +
-                ", lat=" + latitude +
-                ", lon=" + longitude +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", isPedestrian=" + isPedestrianCrossingLight +
-                ", dist=" + String.format("%.2f", distanceMeters) + "m" +
+                ", distanceMeters=" + String.format("%.2f", distanceMeters) + "m" +
                 '}';
     }
 }

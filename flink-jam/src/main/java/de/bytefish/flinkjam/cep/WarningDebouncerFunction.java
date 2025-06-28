@@ -12,6 +12,11 @@ import org.apache.flink.util.Collector;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * We need to debounce the events, so we don't generate too many warnings. Imagine you
+ * have a traffic jam and the cars slowly fade out. You probably don't want to send
+ * events, when traffic clears up.
+ */
 public class WarningDebouncerFunction extends KeyedProcessFunction<String, CongestionWarning, CongestionWarning> {
 
     private final long debouncePeriodMillis;

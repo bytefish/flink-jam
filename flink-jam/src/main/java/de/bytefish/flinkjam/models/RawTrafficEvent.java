@@ -68,8 +68,8 @@ public class RawTrafficEvent implements java.io.Serializable {
         return "RawTrafficEvent{" +
                 "timestamp=" + timestamp +
                 ", vehicleId='" + vehicleId + '\'' +
-                ", lat=" + latitude +
-                ", lon=" + longitude +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", speed=" + speed +
                 '}';
     }

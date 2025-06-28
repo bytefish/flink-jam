@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 public class TrafficCongestionWarningSystem {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/flinkjam"; // Database name reverted
-    private static final String DB_USER = "postgis"; // User reverted
-    private static final String DB_PASSWORD = "postgis"; // Password reverted
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/flinkjam";
+    private static final String DB_USER = "postgis";
+    private static final String DB_PASSWORD = "postgis";
 
     /**
      * A Configuration used in Traffic Congestions Patterns.
@@ -88,7 +88,7 @@ public class TrafficCongestionWarningSystem {
         // The simulation should include the following types: Normal Traffic, Light Slowdown, Sustained Slowdown,
         // Traffic Jam, Red Light Phase.  We don't have access to a real data source, so we generate our own
         // traffic events and feed them to Apache Flink using a SourceFunction<>.
-        DataStream<RawTrafficEvent> rawTrafficEvents = env.addSource(new RawTrafficEventSource()) // Reverted to addSource
+        DataStream<RawTrafficEvent> rawTrafficEvents = env.addSource(new RawTrafficEventSource())
                 .assignTimestampsAndWatermarks(rawEventWmStrategy); // Apply watermark strategy
 
         // Now we need to enrich the raw events with the road segment data, so we get the speed limit and road_segment,

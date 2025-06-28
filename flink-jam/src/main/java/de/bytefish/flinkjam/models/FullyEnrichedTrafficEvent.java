@@ -71,20 +71,6 @@ public class FullyEnrichedTrafficEvent implements java.io.Serializable {
         return nearbyTrafficLights;
     }
 
-
-    @Override
-    public String toString() {
-        return "FullyEnrichedTrafficEvent{" +
-                "timestamp=" + timestamp +
-                ", vehicleId='" + vehicleId + '\'' +
-                ", roadSegmentId='" + roadSegmentId + '\'' +
-                ", speed=" + speed +
-                ", speedLimit=" + speedLimitKmh +
-                ", roadType='" + roadType + '\'' +
-                ", nearbyLights=" + nearbyTrafficLights +
-                '}';
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -104,5 +90,20 @@ public class FullyEnrichedTrafficEvent implements java.io.Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(timestamp, vehicleId, latitude, longitude, speed, roadSegmentId, speedLimitKmh, roadType, nearbyTrafficLights);
+    }
+
+    @Override
+    public String toString() {
+        return "FullyEnrichedTrafficEvent{" +
+                "timestamp=" + timestamp +
+                ", vehicleId='" + vehicleId + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", speed=" + speed +
+                ", roadSegmentId='" + roadSegmentId + '\'' +
+                ", speedLimitKmh=" + speedLimitKmh +
+                ", roadType='" + roadType + '\'' +
+                ", nearbyTrafficLights=" + nearbyTrafficLights +
+                '}';
     }
 }
