@@ -13,7 +13,7 @@ public class CongestionWarning implements java.io.Serializable  {
     public int speedLimit;
     public String details;
     public List<TrafficLightInfo> relatedTrafficLights; // Can include lights related to the congestion
-    public int affectedUniqueVehiclesCount; // New field
+    public int affectedUniqueVehiclesCount;
 
     public CongestionWarning() {
     }
