@@ -1,5 +1,7 @@
 package de.bytefish.flinkjam.lookup;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import de.bytefish.flinkjam.models.FullyEnrichedTrafficEvent;
 import de.bytefish.flinkjam.models.RoadEnrichedTrafficEvent;
 import de.bytefish.flinkjam.models.TrafficLightInfo;
@@ -16,10 +18,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class AsyncTrafficLightLookupFunction extends RichAsyncFunction<RoadEnrichedTrafficEvent, FullyEnrichedTrafficEvent> {
 
     private transient ExecutorService executorService;
+    private transient HikariDataSource dataSource; // HikariCP DataSource
 
     private String dbUrl;
     private String dbUser;
@@ -44,14 +48,39 @@ public class AsyncTrafficLightLookupFunction extends RichAsyncFunction<RoadEnric
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
-        executorService = Executors.newFixedThreadPool(10); // Use a separate pool or a shared one for all lookups
+        // Initialize HikariCP connection pool
+        HikariConfig config = new HikariConfig();
+
+        config.setJdbcUrl(dbUrl);
+        config.setUsername(dbUser);
+        config.setPassword(dbPassword);
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.setMinimumIdle(5); // Minimum idle connections
+        config.setMaximumPoolSize(20); // Maximum total connections (tune this based on DB capacity)
+        config.setConnectionTimeout(5000); // 5 seconds connection timeout
+        config.setIdleTimeout(300000); // 5 minutes idle timeout
+        config.setMaxLifetime(1800000); // 30 minutes max connection lifetime
+
+        // Adjust the thread pool size for the AsyncFunction to match or exceed HikariCP's pool size
+        // A higher number of threads allows more concurrent async DB calls.
+        executorService = Executors.newFixedThreadPool(config.getMaximumPoolSize() * 2);
+
+        dataSource = new HikariDataSource(config);
     }
 
     @Override
     public void close() throws Exception {
         super.close();
+
         if (executorService != null) {
             executorService.shutdown();
+            executorService.awaitTermination(5, TimeUnit.SECONDS); // Wait for threads to finish
+        }
+
+        if (dataSource != null) {
+            dataSource.close(); // Close the connection pool
         }
     }
 
@@ -60,7 +89,7 @@ public class AsyncTrafficLightLookupFunction extends RichAsyncFunction<RoadEnric
         executorService.submit(() -> {
             List<TrafficLightInfo> nearbyTrafficLights = new ArrayList<>();
             // Open connection within the submitted task to ensure thread safety
-            try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+            try (Connection connection = dataSource.getConnection()) {
                 try (PreparedStatement statement = connection.prepareStatement(LOOKUP_SQL)) {
                     statement.setDouble(1, input.longitude); // For ST_MakePoint
                     statement.setDouble(2, input.latitude);  // For ST_MakePoint

@@ -14,6 +14,7 @@ public class RawTrafficEventSource implements SourceFunction<RawTrafficEvent> {
     private volatile boolean isRunning = true;
 
     public List<RawTrafficEvent> simulatedEvents;
+
     public long currentBaseTimestamp;
 
     public RawTrafficEventSource() {
@@ -85,6 +86,7 @@ public class RawTrafficEventSource implements SourceFunction<RawTrafficEvent> {
             );
 
             ctx.collect(eventToSend);
+
             eventIndex++;
 
             try {
