@@ -43,8 +43,8 @@ public class AsyncRoadSegmentLookupFunction extends RichAsyncFunction<RawTraffic
                     "WHERE \n" +
                     "    ST_DWithin(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography, ?)\n" +
                     "ORDER BY \n" +
-                    "    distance asc";
-
+                    "    distance asc \n" +
+                    "LIMIT 1;";
 
     public AsyncRoadSegmentLookupFunction(String dbUrl, String dbUser, String dbPassword, double lookupRadiusMeters) {
         this.dbUrl = dbUrl;
