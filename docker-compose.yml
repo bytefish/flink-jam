@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   db:
-    image: postgis/postgis:16-3.4
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
     container_name: postgis_db
     environment:
       POSTGRES_USER: postgis
