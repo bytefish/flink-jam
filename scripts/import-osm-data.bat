@@ -7,7 +7,7 @@ set OSM2PGSQL_EXECUTABLE="C:\Users\philipp\source\repos\bytefish\osm2pgsql-lates
 
 :: Parameters
 set OSM_STYLE="C:\Users\philipp\source\repos\bytefish\osm2pgsql-latest-x64\osm2pgsql-bin\default.style"
-set OSM_PBF="C:\Users\philipp\Downloads\nordrhein-westfalen-250618.osm.pbf"
+set OSM_PBF="C:\Users\philipp\Downloads\muenster-regbez-latest.osm.pbf"
 
 SET DB_USER=postgis
 SET DB_PASSWD=postgis
