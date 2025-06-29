@@ -45,8 +45,12 @@ public class TrafficSimulationApplication {
         // 40 vehicles with a maximum duration of 60 minutes, with the vehicles sending in a 3 second interval.
         TrafficSimulator trafficSimulator = new TrafficSimulator(40, 60, 3, 5, 0.8);
 
+        // Now run the Simulation based on the Route Segments determined by pgRouting and our simulated congestion events. The idea
+        // is, that the Apache Flink Pipeline needs to detect exactely these simulated data points. We are not using the processing
+        // time, but use the event time in Apache Flink, so putting in the events faster, than in real life is not a problem.
         List<TrafficEventRecord> trafficEventRecords = trafficSimulator.runSimulationLogic(simulatedRouteSegments, congestionEvents);
 
+        // For now just print out the vehicle traffic data as CSV.
         for(TrafficEventRecord trafficEventRecord : trafficEventRecords) {
             System.out.println(trafficEventRecord.toCsvString());
         }
@@ -60,7 +64,8 @@ public class TrafficSimulationApplication {
                 (int)(simulatedRouteSegments.size() * 0.1),
                 (int)(simulatedRouteSegments.size() * 0.3),
                 20, 45, 0.4)); // 40% speed limit for 25 min
-        // Example 2: Heavy jam in the middle third of the route
+
+        // Example 2: Heavy jam in the middle of the route
         congestionEvents.add(new CongestionEvent(
                 (int)(simulatedRouteSegments.size() * 0.4),
                 (int)(simulatedRouteSegments.size() * 0.6),
