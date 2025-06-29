@@ -1,4 +1,4 @@
-package de.bytefish.trafficsim.services;
+package de.bytefish.trafficsim.simulation;
 
 import de.bytefish.trafficsim.models.CongestionEvent;
 import de.bytefish.trafficsim.models.SimulatedRouteSegment;
@@ -11,29 +11,41 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public class TrafficSimulationService {
+public class TrafficSimulator {
 
     private static final Random random = new Random();
 
+    private final int numConcurrentVehicles;
+    private final int simulationDurationMinutes;
+    private final int dataIntervalSeconds;
+    private final int initialSpawnIntervalSeconds;
+    private final double baseAvgSpeedFactor;
+
     /**
-     * Encapsulates the core traffic simulation logic as a static function.
-     * It takes simulation parameters, road segments, and congestion events as input.
+     * Initializes a new TrafficSimulationService.
      *
-     * @param simulatedRouteSegments The list of road segments (pgRouting ways) for the simulation.
-     * @param congestionEvents The list of predefined congestion events.
      * @param numConcurrentVehicles Target number of vehicles active simultaneously.
      * @param simulationDurationMinutes Total simulation duration in minutes.
      * @param dataIntervalSeconds Data recording interval per vehicle (time step).
      * @param initialSpawnIntervalSeconds How often a new vehicle attempts to spawn initially.
      * @param baseAvgSpeedFactor Vehicles will try to maintain this factor of the segment's speed limit (uncongested).
+     */
+    public TrafficSimulator(int numConcurrentVehicles, int simulationDurationMinutes, int dataIntervalSeconds, int initialSpawnIntervalSeconds, double baseAvgSpeedFactor) {
+        this.numConcurrentVehicles = numConcurrentVehicles;
+        this.simulationDurationMinutes = simulationDurationMinutes;
+        this.dataIntervalSeconds = dataIntervalSeconds;
+        this.initialSpawnIntervalSeconds = initialSpawnIntervalSeconds;
+        this.baseAvgSpeedFactor = baseAvgSpeedFactor;
+    }
+
+    /**
+     * Runs the Simulation Logic for the given Setup.
+     *
+     * @param simulatedRouteSegments The list of road segments (pgRouting ways) for the simulation.
+     * @param congestionEvents The list of predefined congestion events.
      * @return A list of TrafficEventRecord objects representing traffic events.
      */
-    public static List<TrafficEventRecord> runSimulationLogic( // Changed return type to List<TrafficEventRecord>
-                                                                List<SimulatedRouteSegment> simulatedRouteSegments,
-                                                                List<CongestionEvent> congestionEvents,
-                                                                int numConcurrentVehicles, int simulationDurationMinutes,
-                                                                int dataIntervalSeconds, int initialSpawnIntervalSeconds,
-                                                                double baseAvgSpeedFactor) {
+    public List<TrafficEventRecord> runSimulationLogic(List<SimulatedRouteSegment> simulatedRouteSegments, List<CongestionEvent> congestionEvents) {
 
         List<TrafficEventRecord> allRecords = new ArrayList<>(); // Changed to List<TrafficEventRecord>
         // Removed header addition here, it's now handled by main method.

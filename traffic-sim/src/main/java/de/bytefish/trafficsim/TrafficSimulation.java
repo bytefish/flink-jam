@@ -7,13 +7,13 @@ import de.bytefish.trafficsim.models.Point;
 import de.bytefish.trafficsim.models.SimulatedRouteSegment;
 import de.bytefish.trafficsim.models.TrafficEventRecord;
 import de.bytefish.trafficsim.services.PgRoutingService;
-import de.bytefish.trafficsim.services.TrafficSimulationService;
+import de.bytefish.trafficsim.simulation.TrafficSimulator;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrafficSimulation {
+public class TrafficSimulationApplication {
 
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/flinkjam";
     private static final String DB_USER = "postgis";
@@ -41,8 +41,11 @@ public class TrafficSimulation {
         // the position on the simulated road the congestion occurs upon.
         List<CongestionEvent> congestionEvents = createCongestionEvents(simulatedRouteSegments);
 
-        List<TrafficEventRecord> trafficEventRecords = TrafficSimulationService
-                .runSimulationLogic(simulatedRouteSegments, congestionEvents, 40, 60, 3, 5, 0.8);
+        // Builds a new TrafficSimulator we are going to derive the vehicle data from. In this example we are simulating
+        // 40 vehicles with a maximum duration of 60 minutes, with the vehicles sending in a 3 second interval.
+        TrafficSimulator trafficSimulator = new TrafficSimulator(40, 60, 3, 5, 0.8);
+
+        List<TrafficEventRecord> trafficEventRecords = trafficSimulator.runSimulationLogic(simulatedRouteSegments, congestionEvents);
 
         for(TrafficEventRecord trafficEventRecord : trafficEventRecords) {
             System.out.println(trafficEventRecord.toCsvString());

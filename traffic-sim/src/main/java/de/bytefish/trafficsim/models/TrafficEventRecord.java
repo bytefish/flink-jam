@@ -8,12 +8,12 @@ import java.util.Locale;
  * Represents a single recorded traffic event (a row in the output CSV).
  */
 public class TrafficEventRecord {
-    private final LocalDateTime timestamp;
-    private final String vehicleId;
-    private final double latitude;
-    private final double longitude;
-    private final double speedKmh;
-    private final int simulatedRouteSegmentIndex;
+    public final LocalDateTime timestamp;
+    public final String vehicleId;
+    public final double latitude;
+    public final double longitude;
+    public final double speedKmh;
+    public final int simulatedRouteSegmentIndex;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
