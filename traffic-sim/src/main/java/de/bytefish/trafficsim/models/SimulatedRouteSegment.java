@@ -8,12 +8,12 @@ import de.bytefish.trafficsim.utils.Haversine;
  * now carries its specific speed limit as extracted from OSM data via pgRouting.
  */
 public class SimulatedRouteSegment {
-    int index; // Unique identifier for this micro-segment within the route (0 to N-1)
-    Point start;
-    Point end;
-    double lengthKm;
-    double speedLimitKmh; // Actual speed limit for this segment, from OSM data
-    double currentCongestionFactor; // Factor applied to speed limit (1.0 = no congestion)
+    public int index; // Unique identifier for this micro-segment within the route (0 to N-1)
+    public Point start;
+    public Point end;
+    public double lengthKm;
+    public double speedLimitKmh; // Actual speed limit for this segment, from OSM data
+    public double currentCongestionFactor; // Factor applied to speed limit (1.0 = no congestion)
 
     public SimulatedRouteSegment(int index, Point start, Point end, double speedLimitKmh) {
         this.index = index;

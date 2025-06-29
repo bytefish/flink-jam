@@ -1,17 +1,14 @@
 package de.bytefish.trafficsim.services;
 
-import com.zaxxer.hikari.HikariDataSource;
 import de.bytefish.trafficsim.models.Point;
 import de.bytefish.trafficsim.models.SimulatedRouteSegment;
 
 import javax.sql.DataSource;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,55 +21,53 @@ public class PgRoutingService {
         this.dataSource = dataSource;
     }
 
-    /**
-     * Gets the nearest Vertex for a given point.
-     *
-     * @param latitude Latitude
-     * @param longitude Longitude
-     * @return Get the Vertex for the given Point
-     * @throws Exception Any Exception thrown during Processing
-     */
-    public OptionalLong getVertexIdByLatitudeAndLongitude(double latitude, double longitude) throws Exception {
-        final String sql = "SELECT id FROM ways_vertices_pgr ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326) LIMIT 1;";
+    public OptionalLong getVertexId(Point point) throws Exception {
+        try {
+            final String sql = "SELECT id FROM ways_vertices_pgr ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(?, ?), 4326) LIMIT 1;";
 
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (Connection connection = dataSource.getConnection()) {
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-                statement.setDouble(1, longitude);
-                statement.setDouble(2, latitude);
+                    statement.setDouble(1, point.lon);
+                    statement.setDouble(2, point.lat);
 
-                try (ResultSet rs = statement.executeQuery()) {
-                    if (rs.next()) {
-                        long vertexId = rs.getLong("id");
+                    try (ResultSet rs = statement.executeQuery()) {
+                        if (rs.next()) {
+                            long vertexId = rs.getLong("id");
 
-                        return OptionalLong.of(vertexId) ;
+                            return OptionalLong.of(vertexId);
+                        }
                     }
                 }
             }
-        }
 
-        return OptionalLong.empty();
+            return OptionalLong.empty();
+        } catch (Exception e) {
+            // TODO Add Logging to understand, why we cannot determine a Vertex.
+            return OptionalLong.empty();
+        }
     }
 
-    public ArrayList<SimulatedRouteSegment> getRouteSegmentsByCoordinates(double startLat, double startLon, double endLat, double endLon) throws Exception {
-        OptionalLong sourceVertexId = getVertexIdByLatitudeAndLongitude(startLat, startLon);
+    public List<SimulatedRouteSegment> getRouteSegmentsBetween(Point start, Point end) throws Exception {
+
+        OptionalLong sourceVertexId = getVertexId(start);
 
         if(sourceVertexId.isEmpty()) {
-            // TODO Logging
+            // TODO Add Logging to understand why the Route is empty
             return new ArrayList<>();
         }
 
-        OptionalLong targetVertexId = getVertexIdByLatitudeAndLongitude(endLat, endLon);
+        OptionalLong targetVertexId = getVertexId(end);
 
         if(targetVertexId.isEmpty()) {
-            // TODO Logging
+            // TODO Add Logging to understand why the Route is empty
             return new ArrayList<>();
         }
 
-        return getRouteSegmentsByVertex(sourceVertexId.getAsLong(), targetVertexId.getAsLong());
+        return getRouteSegmentsBetweenVertex(sourceVertexId.getAsLong(), targetVertexId.getAsLong());
     }
 
-    public ArrayList<SimulatedRouteSegment> getRouteSegmentsByVertex(long sourceVertexId, long targetVertexId) throws Exception {
+    private List<SimulatedRouteSegment> getRouteSegmentsBetweenVertex(long sourceVertexId, long targetVertexId) throws Exception {
         ArrayList<SimulatedRouteSegment> routeSegments = new ArrayList<>();
 
         int segmentIndex = 0;
@@ -80,24 +75,24 @@ public class PgRoutingService {
         // Execute the pgRouting Dijkstra query and get individual segment
         // details. 'maxspeed_forward' is typically created by osm2pgrouting.
         String sql = "SELECT " +
-                        "    route.seq, " +
-                        "    ways.id AS way_id, " +
-                        "    COALESCE(ways.maxspeed_forward, ways.maxspeed, 0) AS segment_speed_limit, " + // Prioritize maxspeed_forward, then maxspeed, else 0
-                        "    ST_AsText(ways.geom_way) AS way_geom_wkt " +
-                        "FROM pgr_dijkstra(" +
-                        "    'SELECT id, source, target, cost, reverse_cost FROM ways'," + // Include reverse_cost for directed graph
-                        "    ?, ?," + // source_vertex_id, target_vertex_id
-                        "    directed := true" +
-                        ") AS route " +
-                        "JOIN ways ON route.edge = ways.id " +
-                        "WHERE route.edge != -1 " +
-                        "ORDER BY route.seq;";
+                "    route.seq, " +
+                "    ways.osm_id AS way_id, " + // Changed ways.id to ways.osm_id for the original OSM Way ID
+                "    COALESCE(ways.maxspeed_forward, 0) AS segment_speed_limit, " + // Prioritize maxspeed_forward, then maxspeed, else 0
+                "    ST_AsText(ways.the_geom) AS way_geom_wkt " +
+                "FROM pgr_dijkstra(" +
+                "    'SELECT gid AS id, source, target, cost, reverse_cost FROM ways'," + // Changed id to gid AS id for the pgr_dijkstra subquery
+                "    ?, ?," + // source_id, target_id
+                "    directed := true" + // Assuming your osm2pgrouting data has proper directionality
+                ") AS route " +
+                "JOIN ways ON route.edge = ways.gid " + // Corrected: changed ways.id to ways.gid
+                "WHERE route.edge != -1 " + // Exclude initial dummy edge/node if it exists
+                "ORDER BY route.seq";
 
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-                statement.setDouble(1, sourceVertexId);
-                statement.setDouble(2, targetVertexId);
+                statement.setLong(1, sourceVertexId);
+                statement.setLong(2, targetVertexId);
 
                 try (ResultSet rs = statement.executeQuery()) {
                     // Regex to parse coordinates from LINESTRING WKT
