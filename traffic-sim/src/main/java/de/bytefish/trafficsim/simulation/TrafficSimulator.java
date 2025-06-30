@@ -47,8 +47,7 @@ public class TrafficSimulator {
      */
     public List<TrafficEventRecord> runSimulationLogic(List<SimulatedRouteSegment> simulatedRouteSegments, List<CongestionEvent> congestionEvents) {
 
-        List<TrafficEventRecord> allRecords = new ArrayList<>(); // Changed to List<TrafficEventRecord>
-        // Removed header addition here, it's now handled by main method.
+        List<TrafficEventRecord> allRecords = new ArrayList<>();
 
         LocalDateTime simulationStartTime = LocalDateTime.now();
         List<Vehicle> activeVehicles = new ArrayList<>();
